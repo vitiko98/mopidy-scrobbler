@@ -60,7 +60,7 @@ def test_track_playback_started_updates_now_playing(pylast_mock, frontend):
     frontend.track_playback_started(tl_track)
 
     frontend.lastfm.update_now_playing.assert_called_with(
-        "ABC, XYZ",
+        "ABC",
         "One Two Three",
         duration="180",
         album="The Collection",
@@ -111,7 +111,7 @@ def test_track_playback_ended_scrobbles_played_track(pylast_mock, frontend):
     frontend.track_playback_ended(tl_track, 150000)
 
     frontend.lastfm.scrobble.assert_called_with(
-        "ABC, XYZ",
+        "ABC",
         "One Two Three",
         "123",
         duration="180",

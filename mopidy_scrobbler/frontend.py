@@ -23,6 +23,21 @@ PYLAST_ERRORS = tuple(
 )
 
 
+def _handle_artist(track):
+    try:
+        to_try = (track.album.artists, track.artists)
+    except AttributeError:
+        return ""
+
+    for item in to_try:
+        try:
+            return list(item)[0].name or ""
+        except IndexError:
+            pass
+
+    return ""
+
+
 class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
     def __init__(self, config, core):
         super().__init__()
@@ -51,7 +66,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
         logger.debug(f"Now playing track: {artists} - {track.name}")
         try:
             self.lastfm.update_now_playing(
-                artists,
+                _handle_artist(track),
                 (track.name or ""),
                 album=(track.album and track.album.name or ""),
                 duration=str(duration),
@@ -79,7 +94,7 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
         logger.debug(f"Scrobbling track: {artists} - {track.name}")
         try:
             self.lastfm.scrobble(
-                artists,
+                _handle_artist(track),
                 (track.name or ""),
                 str(self.last_start_time),
                 album=(track.album and track.album.name or ""),
