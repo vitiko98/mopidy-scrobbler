@@ -1,4 +1,5 @@
 import logging
+import re
 import time
 
 import pykka
@@ -21,6 +22,12 @@ PYLAST_ERRORS = tuple(
     )
     if hasattr(pylast, exc_name)
 )
+
+_TRIVIAL_RE = re.compile(r"(\(|-\s)[^()]*.*(master|studio).*[^()]*$")
+
+
+def _remove_trivial(title):
+    return _TRIVIAL_RE.sub("", title).strip()
 
 
 def _handle_artist(track):
@@ -67,8 +74,8 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
         try:
             self.lastfm.update_now_playing(
                 _handle_artist(track),
-                (track.name or ""),
-                album=(track.album and track.album.name or ""),
+                _remove_trivial(track.name or ""),
+                album=_remove_trivial(track.album and track.album.name or ""),
                 duration=str(duration),
                 track_number=str(track.track_no or 0),
                 mbid=(track.musicbrainz_id or ""),
@@ -95,9 +102,9 @@ class ScrobblerFrontend(pykka.ThreadingActor, CoreListener):
         try:
             self.lastfm.scrobble(
                 _handle_artist(track),
-                (track.name or ""),
+                _remove_trivial(track.name or ""),
                 str(self.last_start_time),
-                album=(track.album and track.album.name or ""),
+                album=_remove_trivial(track.album and track.album.name or ""),
                 track_number=str(track.track_no or 0),
                 duration=str(duration),
                 mbid=(track.musicbrainz_id or ""),
