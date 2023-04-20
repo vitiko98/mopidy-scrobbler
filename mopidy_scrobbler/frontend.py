@@ -23,7 +23,10 @@ PYLAST_ERRORS = tuple(
     if hasattr(pylast, exc_name)
 )
 
-_TRIVIAL_RE = re.compile(r"(\(|-\s)[^()]*.*(master|studio|version|explicit).*[^()]*$")
+_TRIVIAL_RE = re.compile(
+    r"(\(|-\s)[^()]*.*(master|studio|version|explicit).*[^()]*$",
+    flags=re.IGNORECASE,
+)
 
 
 def _remove_trivial(title):
